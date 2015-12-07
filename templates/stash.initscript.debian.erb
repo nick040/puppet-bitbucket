@@ -1,29 +1,29 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          stash
+# Provides:          bitbucket
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Initscript for Atlassian Stash
-# Description:  Automatically start Atlassian Stash when the system starts up.
-#               Provide commands for manually starting and stopping Stash.
+# Short-Description: Initscript for Atlassian Bitbucket
+# Description:  Automatically start Atlassian Bitbucket when the system starts up.
+#               Provide commands for manually starting and stopping Bitbucket.
 ### END INIT INFO
 # Adapt the following lines to your configuration
-# RUNUSER: The user to run Stash as.
-RUNUSER=<%= scope.lookupvar('stash::user') %>
-# STASH_INSTALLDIR: The path to the Stash installation directory
-STASH_INSTALLDIR="<%= scope.lookupvar('stash::webappdir') %>"
-# STASH_HOME: Path to the Stash home directory
-STASH_HOME="<%= scope.lookupvar('stash::homedir') %>"
+# RUNUSER: The user to run Bitbucket as.
+RUNUSER=<%= scope.lookupvar('bitbucket::user') %>
+# BITBUCKET_INSTALLDIR: The path to the Bitbucket installation directory
+BITBUCKET_INSTALLDIR="<%= scope.lookupvar('bitbucket::webappdir') %>"
+# BITBUCKET_HOME: Path to the Bitbucket home directory
+BITBUCKET_HOME="<%= scope.lookupvar('bitbucket::homedir') %>"
 # ==================================================================================
 # ==================================================================================
 # ==================================================================================
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Atlassian Stash"
-NAME=stash
-PIDFILE=$STASH_INSTALLDIR/work/catalina.pid
+DESC="Atlassian Bitbucket"
+NAME=bitbucket
+PIDFILE=$BITBUCKET_INSTALLDIR/work/catalina.pid
 SCRIPTNAME=/etc/init.d/$NAME
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
@@ -51,9 +51,9 @@ log_end_msg () {
  
 run_with_home() {
     if [ "$RUNUSER" != "$USER" ]; then
-        su - "$RUNUSER" -c "export STASH_HOME=${STASH_HOME};${STASH_INSTALLDIR}/bin/$1"
+        su - "$RUNUSER" -c "export BITBUCKET_HOME=${BITBUCKET_HOME};${BITBUCKET_INSTALLDIR}/bin/$1"
     else
-        export STASH_HOME=${STASH_HOME};${STASH_INSTALLDIR}/bin/$1
+        export BITBUCKET_HOME=${BITBUCKET_HOME};${BITBUCKET_INSTALLDIR}/bin/$1
     fi
 }
 #
@@ -61,7 +61,7 @@ run_with_home() {
 #
 do_start()
 {
-    run_with_home start-stash.sh
+    run_with_home start-bitbucket.sh
 }
 #
 # Function that stops the daemon/service
@@ -69,7 +69,7 @@ do_start()
 do_stop()
 {
     if [ -e $PIDFILE ]; then
-      run_with_home stop-stash.sh
+      run_with_home stop-bitbucket.sh
     else
       log_failure_msg "$NAME is not running."
     fi
@@ -97,7 +97,7 @@ case "$1" in
          log_failure_msg "$NAME is not running."
          return 1
        fi
-       status_of_proc -p $PIDFILE "stash" $NAME && exit 0 || exit $?
+       status_of_proc -p $PIDFILE "bitbucket" $NAME && exit 0 || exit $?
        ;;
   restart|force-reload)
     #

@@ -16,9 +16,7 @@ class bitbucket::install(
   $git_version    = $bitbucket::git_version,
   $repoforge      = $bitbucket::repoforge,
   $downloadURL    = $bitbucket::downloadURL,
-  $s_or_d         = $bitbucket::staging_or_deploy,
   $git_manage     = $bitbucket::git_manage,
-
   $webappdir
   ) {
   
@@ -83,50 +81,32 @@ class bitbucket::install(
 
   # Deploy files using either staging or deploy modules.
   $file = "atlassian-${product}-${version}.${format}"
-  case $s_or_d {
-    'staging': {
-      require staging
-      if ! defined(File[$webappdir]) {
-        file { $webappdir:
-          ensure => 'directory',
-          owner  => $user,
-          group  => $group,
-        }
-      }
-      staging::file { $file:
-        source  => "${downloadURL}/${file}",
-        timeout => 1800,
-      } ->
-      staging::extract { $file:
-        target  => $webappdir,
-        creates => "${webappdir}/conf",
-        strip   => 1,
-        user    => $user,
-        group   => $group,
-        notify  => Exec["chown_${webappdir}"],
-        before  => File[$homedir],
-        require => [
-          File[$installdir],
-          User[$user],
-          File[$webappdir] ],
-      }
+
+  require staging
+
+  if ! defined(File[$webappdir]) {
+    file { $webappdir:
+      ensure => 'directory',
+      owner  => $user,
+      group  => $group,
     }
-    'deploy': {
-      deploy::file { "atlassian-${product}-${version}.${format}":
-        target          => $webappdir,
-        url             => $downloadURL,
-        strip           => true,
-        owner           => $user,
-        group           => $group,
-        download_timout => 1800,
-        notify          => Exec["chown_${webappdir}"],
-        before          => File[$homedir],
-        require         => [ File[$installdir], User[$user] ]
-      }
-    }
-    default: {
-      fail('staging_or_deploy parameter must equal "staging" or "deploy"')
-    }
+  }
+  staging::file { $file:
+    source  => "${downloadURL}/${file}",
+    timeout => 1800,
+  } ->
+  staging::extract { $file:
+    target  => $webappdir,
+    creates => "${webappdir}/conf",
+    strip   => 1,
+    user    => $user,
+    group   => $group,
+    notify  => Exec["chown_${webappdir}"],
+    before  => File[$homedir],
+    require => [
+      File[$installdir],
+      User[$user],
+      File[$webappdir] ],
   }
 
   file { $homedir:

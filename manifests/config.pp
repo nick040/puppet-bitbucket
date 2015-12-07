@@ -11,30 +11,14 @@ class bitbucket::config(
   $tomcat_port  = $bitbucket::tomcat_port,
 ) {
 
-  # Atlassian changed where files are installed from ver 3.2.0
-  # See issue #16 for more detail
-  if versioncmp($version, '3.2.0') > 0 {
-    $moved = 'shared/'
-    file { "${bitbucket::homedir}/${moved}":
-      ensure  => 'directory',
-      owner   => $user,
-      group   => $group,
-      require => File[$bitbucket::homedir],
-    }
-  } else {
-    $moved = undef
-  }
-
   File {
     owner => $bitbucket::user,
     group => $bitbucket::group,
   }
 
-  if versioncmp($version, '3.8.0') >= 0 {
-    $server_xml = "${bitbucket::homedir}/shared/server.xml"
-  } else {
-    $server_xml = "${bitbucket::webappdir}/conf/server.xml"
-  }
+  file { "${bitbucket::homedir}/shared":
+      ensure  => 'directory',
+  } ->
 
   file { "${bitbucket::webappdir}/bin/setenv.sh":
     content => template('bitbucket/setenv.sh.erb'),
@@ -51,9 +35,9 @@ class bitbucket::config(
       File[$bitbucket::webappdir],
       File[$bitbucket::homedir]
     ],
-  }->
+  } ->
 
-  file { $server_xml:
+  file { "${bitbucket::homedir}/shared/server.xml":
     content => template('bitbucket/server.xml.erb'),
     mode    => '0640',
     require => Class['bitbucket::install'],
@@ -70,7 +54,7 @@ class bitbucket::config(
     before  => Class['bitbucket::service'],
   } ->
 
-  file { "${bitbucket::homedir}/${moved}bitbucket-config.properties":
+  file { "${bitbucket::homedir}/shared/bitbucket-config.properties":
     content => template('bitbucket/bitbucket-config.properties.erb'),
     mode    => '0750',
     require => [

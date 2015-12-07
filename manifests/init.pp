@@ -1,6 +1,6 @@
 # == Class: bitbucket
 #
-# This modules installs Atlassian bitbucket.
+# This modules installs Atlassian Bitbucket.
 #
 class bitbucket(
 
@@ -14,7 +14,7 @@ class bitbucket(
   $java_opts    = '',
 
   # Bitbucket Settings
-  $version      = '3.7.0',
+  $version      = '4.0.0',
   $product      = 'bitbucket',
   $format       = 'tar.gz',
   $installdir   = '/opt/bitbucket',
@@ -29,7 +29,7 @@ class bitbucket(
   $uid            = undef,
   $gid            = undef,
 
-  # Bitbucket 3.8 initialization configurations
+  # Bitbucket 4.0 initialization configurations
   $display_name  = 'bitbucket',
   $base_url      = "https://${::fqdn}",
   $license       = '',
@@ -50,7 +50,7 @@ class bitbucket(
   # Backup Settings
   $backup_ensure       = 'present',
   $backupclientURL     = 'https://maven.atlassian.com/content/repositories/atlassian-public/com/atlassian/bitbucket/backup/bitbucket-backup-distribution/',
-  $backupclientVersion = '1.6.0',
+  $backupclientVersion = '1.9.1',
   $backup_home         = '/opt/bitbucket-backup',
   $backupuser          = 'admin',
   $backuppass          = 'password',
@@ -76,10 +76,6 @@ class bitbucket(
   # puppetlabs-corosync module: 'crm resource stop bitbucket && sleep 15'
   $stop_bitbucket = 'service bitbucket stop && sleep 15',
 
-  # Choose whether to use nanliu-staging, or mkrakowitzer-deploy
-  # Defaults to nanliu-staging as it is puppetlabs approved.
-  $staging_or_deploy = 'staging',
-
 ) {
 
   validate_bool($git_manage)
@@ -96,9 +92,6 @@ class bitbucket(
     if versioncmp($version, $::bitbucket_version) > 0 {
       notify { 'Attempting to upgrade bitbucket': }
       exec { $stop_bitbucket: }
-      if versioncmp($version, '3.2.0') > 0 {
-        exec { "rm -f ${homedir}/bitbucket-config.properties": }
-      }
     }
   }
 
