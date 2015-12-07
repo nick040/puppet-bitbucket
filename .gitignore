@@ -1,0 +1,11 @@
+pkg/
+*kate-swp
+.kateproject.d
+*.swp
+*.settings
+*.project
+Gemfile.lock
+.vagrant
+spec/fixtures/*
+fixtures/
+vagrant_files/

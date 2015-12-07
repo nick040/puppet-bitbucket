@@ -1,0 +1,34 @@
+---
+language: ruby
+bundler_args: --without development system_tests
+before_install: rm Gemfile.lock || true
+sudo: false
+matrix:
+  include:
+  - rvm: 1.9.3
+    env: PUPPET_GEM_VERSION="~> 3.3.0"
+  - rvm: 1.9.3
+    env: PUPPET_GEM_VERSION="~> 3.7.0"
+  - rvm: 2.0.0
+    env: PUPPET_GEM_VERSION="~> 3.0"
+  - rvm: 2.0.0
+    env: PUPPET_GEM_VERSION="~> 3.5.0" STRICT_VARIABLES=yes
+  - rvm: 2.0.0
+    env: PUPPET_GEM_VERSION="~> 3.0" FUTURE_PARSER="yes"
+  - rvm: 2.1.0
+    env: PUPPET_GEM_VERSION="~> 3.0" STRICT_VARIABLES=yes FUTURE_PARSER="yes"
+notifications:
+  email:
+    - merritt@krakowitzer.com
+script: bundle exec rake test
+deploy:
+  provider: puppetforge
+  user: puppet
+  password:
+    secure: "HJzcyYqTo3Wrg7Jye1c+BLLv3P2JbXIePIFt0hd25fnlxyjMl2FIWjqwxJ0LO6mFSXU/PxEkfrqjyhzRodtMS5x9Ut90hWV3gSFDWSXBVssVrCSZgQMksXa+tQhk6ieWy3t0sdJmuuALr2v+SrDG2UybTggfKfNdM2k277rdR7w="
+  on:
+    tags: true
+    # all_branches is required to use tags
+    all_branches: true
+    # Only publish if our main Ruby target builds
+    rvm: 1.9.3
